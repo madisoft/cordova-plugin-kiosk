@@ -18,6 +18,7 @@ import jk.cordova.plugin.kiosk.KioskActivity;
 import org.json.JSONObject;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
+import 	android.content.pm.PackageManager;
 
 public class KioskPlugin extends CordovaPlugin {
     
@@ -26,7 +27,33 @@ public class KioskPlugin extends CordovaPlugin {
     public static final String IS_IN_KIOSK = "isInKiosk";
 
     private static final String PREF_KIOSK_MODE = "pref_kiosk_mode";
-
+    
+    /**
+     * method checks to see if app is currently set as default launcher
+     * @return boolean true means currently set as default, otherwise false
+     */ 
+     /*
+    private boolean isMyAppLauncherDefault() {
+        final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
+        filter.addCategory(Intent.CATEGORY_HOME);
+    
+        List<IntentFilter> filters = new ArrayList<IntentFilter>();
+        filters.add(filter);
+    
+        final String myPackageName = getPackageName();
+        List<ComponentName> activities = new ArrayList<ComponentName>();
+        final PackageManager packageManager = (PackageManager) getPackageManager();
+    
+        packageManager.getPreferredActivities(filters, activities, null);
+    
+        for (ComponentName activity : activities) {
+            if (myPackageName.equals(activity.getPackageName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+    */
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -37,7 +64,7 @@ public class KioskPlugin extends CordovaPlugin {
                 return true;
                 
             } else if (EXIT_KIOSK.equals(action)) {
-                
+                /*
                 Intent intent = new Intent(Intent.ACTION_MAIN);
                 intent.addCategory(Intent.CATEGORY_HOME);
                 SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.cordova.getActivity().getApplicationContext());
@@ -46,6 +73,16 @@ public class KioskPlugin extends CordovaPlugin {
                 Intent chooser = Intent.createChooser(intent, "Select destination...");
                 if (intent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
                     cordova.getActivity().startActivity(chooser);
+                }*/
+                
+                PackageManager packageManager = this.cordova.getActivity().getPackageManager();
+                packageManager.clearPackagePreferredActivities(this.cordova.getActivity().getPackageName());
+                Intent intent = new Intent(Intent.ACTION_MAIN);
+                intent.addCategory(Intent.CATEGORY_HOME);
+                SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.cordova.getActivity().getApplicationContext());
+                sp.edit().putBoolean(PREF_KIOSK_MODE, false).commit();
+                if (intent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
+                    cordova.getActivity().startActivity(intent);
                 }
                 
                 callbackContext.success();
