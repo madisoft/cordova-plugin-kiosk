@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
         id="cordova-plugin-kiosk" version="0.2">
-    
+
     <name>Cordova Kiosk Mode</name>
     <author>Jan Kalina</author>
     <description>
@@ -12,26 +12,27 @@
         Escape from app will be possible only by javascript call KioskPlugin.exitKiosk()
         or by uninstallation app using adb. (Keeping USB debug allowed recommended.)
         If applications starts as usual (not as launcher), no restrictions will be applied.
-        
+
         Plugin website: https://github.com/honza889/cordova-plugin-kiosk
         Example app: https://github.com/honza889/cordova-kiosk-demo
-        
+
         This plugin is for Android for now. Support of iOS would be useless,
         becase this feature is builded in iOS as Guided Access.
     </description>
     <keywords>cordova, launcher, homescreen, kiosk, kiosk mode</keywords>
-    
+
     <engines>
         <engine name="cordova" version=">=3.0.0" />
     </engines>
-    
+
     <js-module src="kiosk.js" name="kioskPlugin">
         <clobbers target="window.KioskPlugin" />
     </js-module>
-    
+
     <platform name="android">
-        
+
         <config-file target="res/xml/config.xml" parent="/*">
+            <preference name="orientation" value="sensorLandscape"/>
             <feature name="KioskPlugin">
                 <param name="android-package" value="jk.cordova.plugin.kiosk.KioskPlugin" />
             </feature>
@@ -41,9 +42,20 @@
             <uses-permission android:name="android.permission.REORDER_TASKS" />
             <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
             <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+            <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS"/>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-            <activity android:label="Kiosk app" android:launchMode="singleTop" android:keepScreenOn="true" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale" android:windowSoftInputMode="adjustResize" android:name="jk.cordova.plugin.kiosk.KioskActivity">
+                <activity
+                    android:name="com.t3hh4xx0r.haxlauncher.FakeHome"
+                    android:enabled="false">
+                    <intent-filter>
+                        <action android:name="android.intent.action.MAIN" />
+
+                        <category android:name="android.intent.category.HOME" />
+                        <category android:name="android.intent.category.DEFAULT" />
+                    </intent-filter>
+                </activity>
+            <activity android:label="Rilevatore Presenze Modalità Chiosco" android:launchMode="singleTop" android:keepScreenOn="true" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|uiMode" android:windowSoftInputMode="adjustResize" android:name="jk.cordova.plugin.kiosk.KioskActivity" android:screenOrientation="sensorLandscape">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />
                     <category android:name="android.intent.category.DEFAULT" /><!-- Handler of app icon (required to be launcher) -->
@@ -51,10 +63,11 @@
                 </intent-filter>
             </activity>
         </config-file>
-        
+
         <source-file src="android/KioskActivity.java" target-dir="src/jk/cordova/plugin/kiosk" />
         <source-file src="android/KioskPlugin.java" target-dir="src/jk/cordova/plugin/kiosk" />
+        <source-file src="android/FakeHome.java" target-dir="src/jk/cordova/plugin/kiosk" />
 
     </platform>
-    
+
 </plugin>
