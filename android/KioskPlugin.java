@@ -2,6 +2,10 @@ package jk.cordova.plugin.kiosk;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.ComponentName;
+import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import org.apache.cordova.*;
 import android.widget.*;
@@ -15,10 +19,11 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONException;
 import jk.cordova.plugin.kiosk.KioskActivity;
+import com.t3hh4xx0r.haxlauncher.FakeHome;
 import org.json.JSONObject;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
-import 	android.content.pm.PackageManager;
+import android.content.pm.PackageManager;
 
 public class KioskPlugin extends CordovaPlugin {
     
@@ -31,21 +36,23 @@ public class KioskPlugin extends CordovaPlugin {
     /**
      * method checks to see if app is currently set as default launcher
      * @return boolean true means currently set as default, otherwise false
-     */ 
-     /*
-    private boolean isMyAppLauncherDefault() {
+     */
+    private boolean isMyLauncherDefault() {
         final IntentFilter filter = new IntentFilter(Intent.ACTION_MAIN);
         filter.addCategory(Intent.CATEGORY_HOME);
-    
+
         List<IntentFilter> filters = new ArrayList<IntentFilter>();
         filters.add(filter);
-    
-        final String myPackageName = getPackageName();
+
+        final String myPackageName = this.cordova.getActivity().getPackageName();
         List<ComponentName> activities = new ArrayList<ComponentName>();
-        final PackageManager packageManager = (PackageManager) getPackageManager();
-    
+        PackageManager packageManager = (PackageManager) this.cordova.getActivity().getPackageManager();
+
         packageManager.getPreferredActivities(filters, activities, null);
-    
+
+        if(activities.size() == 0)
+            return true;
+
         for (ComponentName activity : activities) {
             if (myPackageName.equals(activity.getPackageName())) {
                 return true;
@@ -53,12 +60,23 @@ public class KioskPlugin extends CordovaPlugin {
         }
         return false;
     }
-    */
     
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         try {
             if (IS_IN_KIOSK.equals(action)) {
+                if(!isMyLauncherDefault()) {
+                  PackageManager p = this.cordova.getActivity().getPackageManager();
+                  ComponentName cN = new ComponentName(this.cordova.getActivity().getApplicationContext(), FakeHome.class);
+                  p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
+
+                  Intent selector = new Intent(Intent.ACTION_MAIN);
+                  selector.addCategory(Intent.CATEGORY_HOME);
+                  selector.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                  this.cordova.getActivity().startActivity(selector);
+
+                  p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
+                }
                 
                 callbackContext.success(Boolean.toString(KioskActivity.running));
                 return true;
