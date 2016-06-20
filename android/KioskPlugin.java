@@ -7,6 +7,7 @@ import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.os.Process;
 import org.apache.cordova.*;
 import android.widget.*;
 import android.view.Window;
@@ -101,6 +102,7 @@ public class KioskPlugin extends CordovaPlugin {
                 sp.edit().putBoolean(PREF_KIOSK_MODE, false).commit();
                 if (intent.resolveActivity(cordova.getActivity().getPackageManager()) != null) {
                     cordova.getActivity().startActivity(intent);
+                    android.os.Process.killProcess(android.os.Process.myPid());
                 }
                 
                 callbackContext.success();
