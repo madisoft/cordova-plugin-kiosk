@@ -25,6 +25,8 @@ import org.json.JSONObject;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import java.util.ArrayList;
+import java.util.List;
 
 public class KioskPlugin extends CordovaPlugin {
     
