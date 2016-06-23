@@ -18,6 +18,8 @@ import jk.cordova.plugin.kiosk.KioskActivity;
 import org.json.JSONObject;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
+import java.util.List;
+import java.util.ArrayList;
 
 public class KioskPlugin extends CordovaPlugin {
     
