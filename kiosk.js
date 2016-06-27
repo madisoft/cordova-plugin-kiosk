@@ -13,6 +13,14 @@ var KioskPlugin = {
         }, function(error){
             alert("KioskPlugin.isInKiosk failed: "+error);
         }, "KioskPlugin", "isInKiosk", []);
+    },
+
+    initKiosk: function (callback) {
+        exec(function(out){
+            callback(out=="true");
+        }, function(error){
+            alert("KioskPlugin.initKiosk failed: "+error);
+        }, "KioskPlugin", "initKiosk", []);
     }
     
 }
