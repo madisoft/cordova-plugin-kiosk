@@ -5,6 +5,7 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.ComponentName;
 import android.graphics.PixelFormat;
 import android.net.Uri;
 import android.os.Build;
@@ -144,6 +145,11 @@ public class KioskActivity extends CordovaActivity {
         am.moveTaskToFront(getTaskId(), 1);
         sendBroadcast(new Intent("android.intent.action.CLOSE_SYSTEM_DIALOGS"));
         collapseNotifications();
+    }
+    
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return true;
     }
 
     @Override
