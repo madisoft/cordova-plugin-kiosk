@@ -40,26 +40,27 @@
 
         <config-file target="AndroidManifest.xml" parent="/*">
             <uses-permission android:name="android.permission.REORDER_TASKS" />
+            <uses-permission android:name="android.permission.GET_TASKS" />
             <uses-permission android:name="android.permission.EXPAND_STATUS_BAR" />
             <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
             <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS"/>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
                 <activity
+                    android:launchMode="singleInstance" 
                     android:name="com.t3hh4xx0r.haxlauncher.FakeHome"
                     android:enabled="false">
                     <intent-filter>
                         <action android:name="android.intent.action.MAIN" />
-
                         <category android:name="android.intent.category.HOME" />
                         <category android:name="android.intent.category.DEFAULT" />
                     </intent-filter>
                 </activity>
-            <activity android:label="Rilevatore Presenze Modalità Chiosco" android:launchMode="singleTop" android:keepScreenOn="true" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|uiMode" android:windowSoftInputMode="adjustResize" android:name="jk.cordova.plugin.kiosk.KioskActivity" android:screenOrientation="sensorLandscape">
+            <activity android:label="Rilevatore Presenze Modalità Chiosco" android:launchMode="singleInstance" android:keepScreenOn="true" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|uiMode" android:windowSoftInputMode="adjustResize" android:name="jk.cordova.plugin.kiosk.KioskActivity" android:screenOrientation="sensorLandscape">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />
-                    <category android:name="android.intent.category.DEFAULT" /><!-- Handler of app icon (required to be launcher) -->
-                    <category android:name="android.intent.category.HOME" /><!-- Handler of Home button -->
+                    <category android:name="android.intent.category.DEFAULT" />
+                    <category android:name="android.intent.category.HOME" />
                 </intent-filter>
             </activity>
         </config-file>
