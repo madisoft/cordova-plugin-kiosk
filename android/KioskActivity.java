@@ -84,7 +84,7 @@ public class KioskActivity extends CordovaActivity {
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
 
         localLayoutParams.width = WindowManager.LayoutParams.MATCH_PARENT;
-        localLayoutParams.height = (int) (50 * getResources()
+        localLayoutParams.height = (int) (25 * getResources()
                 .getDisplayMetrics().scaledDensity);
         localLayoutParams.format = PixelFormat.TRANSPARENT;
 
