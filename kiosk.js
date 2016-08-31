@@ -7,6 +7,10 @@ var KioskPlugin = {
         exec(null, null, "KioskPlugin", "exitKiosk", []);
     },
     
+    killApp: function () {
+        exec(null, null, "KioskPlugin", "killApp", []);
+    },
+    
     isInKiosk: function (callback) {
         exec(function(out){
             callback(out=="true");
