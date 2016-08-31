@@ -32,6 +32,8 @@ public class KioskPlugin extends CordovaPlugin {
     
     public static final String EXIT_KIOSK = "exitKiosk";
     
+    public static final String KILL_APP = "killApp";
+    
     public static final String IS_IN_KIOSK = "isInKiosk";
     
     public static final String INIT_KIOSK = "initKiosk";
@@ -118,6 +120,11 @@ public class KioskPlugin extends CordovaPlugin {
                 
                 callbackContext.success();
                 return true;
+            } else if (KILL_APP.equals(action)) {
+              android.os.Process.killProcess(android.os.Process.myPid());
+
+              callbackContext.success();
+              return true;
             }
             callbackContext.error("Invalid action");
             return false;
