@@ -32,7 +32,7 @@
     <platform name="android">
 
         <config-file target="res/xml/config.xml" parent="/*">
-            <preference name="orientation" value="sensorLandscape"/>
+            <preference name="orientation" value="landscape"/>
             <feature name="KioskPlugin">
                 <param name="android-package" value="jk.cordova.plugin.kiosk.KioskPlugin" />
             </feature>
