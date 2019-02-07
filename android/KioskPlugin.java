@@ -8,7 +8,6 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Process;
-import android.util.Log;
 import org.apache.cordova.*;
 import android.widget.*;
 import android.view.Window;

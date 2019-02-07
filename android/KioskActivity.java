@@ -24,42 +24,51 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 
 import java.lang.reflect.Method;
+import android.os.SystemClock;
 
 public class KioskActivity extends CordovaActivity {
 
     private static final String PREF_KIOSK_MODE = "pref_kiosk_mode";
     private static final int REQUEST_CODE = 123467;
+    private static String TAG = "KioskActivity";
     public static boolean running = false;
     public static boolean enabledLog = true;
+    protected boolean movedToFront = false;
+    
+    public static Integer SECONDS_IN_BOOT = 120;
     public static Integer LOG_DEBUG = 1;
     public static Integer LOG_ERROR = 0;
+
     Object statusBarService;
     ActivityManager am;
-    private static String TAG = "KioskActivity";
 
-    protected void onStart() {
+    protected void onStart(Integer... param) {
+        Integer force = param.length > 0 ? param[0] : 0;
+
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         if(Build.VERSION.SDK_INT >= 23) {
-            sp.edit().putBoolean(PREF_KIOSK_MODE, false).commit();
-            checkDrawOverlayPermission();
-
             KioskActivity.toAndroidLog("onStart # checkDrawOverlay - build version: " + Build.VERSION.SDK_INT);
+
+            sp.edit().putBoolean(PREF_KIOSK_MODE, false).commit();
+            checkDrawOverlayPermission(force);
         } else {
+            KioskActivity.toAndroidLog("onStart # addOverlay - build version: " + Build.VERSION.SDK_INT);
+
             sp.edit().putBoolean(PREF_KIOSK_MODE, true).commit();
             addOverlay();
-
-            KioskActivity.toAndroidLog("onStart # addOverlay - build version: " + Build.VERSION.SDK_INT);
         }
         running = true;
     }
     //http://stackoverflow.com/questions/7569937/unable-to-add-window-android-view-viewrootw44da9bc0-permission-denied-for-t
     @TargetApi(Build.VERSION_CODES.M)
-    public void checkDrawOverlayPermission() {
-        KioskActivity.toAndroidLog("checkDrawOverlayPermission");
+    public void checkDrawOverlayPermission(Integer... param) {
+        Integer force = param.length > 0 ? param[0] : 0;
+        KioskActivity.toAndroidLog("checkDrawOverlayPermission -------> force: " + force);
+        boolean toForce = force != 0;
 
-        if (!Settings.canDrawOverlays(this.getApplicationContext())) {
-            KioskActivity.toAndroidLog("checkDrawOverlayPermission - dentro if");
+        if (!Settings.canDrawOverlays(this.getApplicationContext()) || toForce) {
+            KioskActivity.toAndroidLog("checkDrawOverlayPermission -> startOverlayPermission");
 
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
                     Uri.parse("package:" + getPackageName()));
@@ -108,30 +117,35 @@ public class KioskActivity extends CordovaActivity {
         manager.addView(view, localLayoutParams);
     }
 
+    protected void moveTaskToFront() {
+      KioskActivity.toAndroidLog("!!! MOVE TASK TO FRONT !!!!!");
+
+      // Trick to avoid Recent App soft button touch
+      SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+      sp.edit().putBoolean(PREF_KIOSK_MODE, true).commit();
+      if(!sp.getBoolean(PREF_KIOSK_MODE, false)) {
+          return;
+      }
+
+      if(am == null) {
+          am = ((ActivityManager)getSystemService("activity"));
+      }
+      am.moveTaskToFront(getTaskId(), 1);
+      sendBroadcast(new Intent("android.intent.action.CLOSE_SYSTEM_DIALOGS"));
+      //collapseNotifications();
+    }
+
     protected void onStop() {
         KioskActivity.toAndroidLog("onStop with trick for Recent Apps soft button");
 
         super.onStop();
         running = false;
-        
-        // Trick to avoid Recent App soft button touch
-        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
-        sp.edit().putBoolean(PREF_KIOSK_MODE, true).commit();
-        if(!sp.getBoolean(PREF_KIOSK_MODE, false)) {
-            return;
-        }
 
-        if(am == null) {
-            am = ((ActivityManager)getSystemService("activity"));
-        }
-        am.moveTaskToFront(getTaskId(), 1);
-        sendBroadcast(new Intent("android.intent.action.CLOSE_SYSTEM_DIALOGS"));
-        //collapseNotifications();
+        this.moveTaskToFront();
     }
 
     public void onCreate(Bundle savedInstanceState) {
-        KioskActivity.toAndroidLog("onCreate");
-
+        KioskActivity.toAndroidLog("onCreate & launchUrl");
         super.onCreate(savedInstanceState);
         super.init();
         loadUrl(launchUrl);
@@ -168,8 +182,9 @@ public class KioskActivity extends CordovaActivity {
 
     public void onPause()
     {
-        KioskActivity.toAndroidLog("onPause -> super.onPause()");
+        KioskActivity.toAndroidLog("onPause -> super.onPause() and checkBoot");
         super.onPause();
+        this.checkBoot();
         return;
     }
     
@@ -178,6 +193,25 @@ public class KioskActivity extends CordovaActivity {
         KioskActivity.toAndroidLog("KeyDown with keycode: " + keyCode);
 
         return true;
+    }
+
+    protected void checkBoot() {
+      if(this.movedToFront) {  /* ho gia forzato l'overlay */
+          return;
+      }
+
+      long bootSince = SystemClock.elapsedRealtime();
+      long bootSinceSec = bootSince / 1000;
+
+      KioskActivity.toAndroidLog("BOOTED FROM " + bootSince + "ms, " + bootSinceSec + "s [< 120]- movedToFront: " + this.movedToFront);
+
+      if(bootSinceSec < KioskActivity.SECONDS_IN_BOOT && !this.movedToFront) {  //RANGE AGGIUSTABILE
+        KioskActivity.toAndroidLog("-------> stop & start activity with FORCE OVERLAY!");
+
+        this.onStop();
+        this.onStart(1); // force overlay app
+        this.movedToFront = true;
+      }
     }
 
     @Override
@@ -216,4 +250,3 @@ public class KioskActivity extends CordovaActivity {
         }
     }
 }
-
