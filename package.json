@@ -1,6 +1,6 @@
 {
     "name": "cordova-plugin-kiosk",
-    "version": "0.2.2",
+    "version": "0.2.3",
     "description": "Cordova Kiosk Mode Plugin",
     "cordova": {
         "id": "cordova-plugin-kiosk",

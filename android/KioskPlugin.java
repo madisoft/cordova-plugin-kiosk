@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.os.Process;
+import android.util.Log;
 import org.apache.cordova.*;
 import android.widget.*;
 import android.view.Window;
@@ -20,7 +21,7 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 import org.json.JSONException;
 import jk.cordova.plugin.kiosk.KioskActivity;
-import com.t3hh4xx0r.haxlauncher.FakeHome;
+import jk.cordova.plugin.kiosk.FakeHome;
 import org.json.JSONObject;
 import android.preference.PreferenceManager;
 import android.content.SharedPreferences;
@@ -73,6 +74,8 @@ public class KioskPlugin extends CordovaPlugin {
         try {
             if (INIT_KIOSK.equals(action)) {
                 if(!isMyLauncherDefault()) {
+                  KioskActivity.toAndroidLog("InitKiosk -> not launcher default");
+
                   PackageManager p = this.cordova.getActivity().getPackageManager();
                   ComponentName cN = new ComponentName(this.cordova.getActivity().getApplicationContext(), FakeHome.class);
                   p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_ENABLED, PackageManager.DONT_KILL_APP);
@@ -84,6 +87,8 @@ public class KioskPlugin extends CordovaPlugin {
 
                   p.setComponentEnabledSetting(cN, PackageManager.COMPONENT_ENABLED_STATE_DISABLED, PackageManager.DONT_KILL_APP);
                   android.os.Process.killProcess(android.os.Process.myPid());
+
+                  KioskActivity.toAndroidLog("InitKiosk -> Kill PROCESS: " + android.os.Process.myPid());
                 }
 
                 callbackContext.success(Boolean.toString(KioskActivity.running));
@@ -117,11 +122,13 @@ public class KioskPlugin extends CordovaPlugin {
                     cordova.getActivity().startActivity(intent);
                     android.os.Process.killProcess(android.os.Process.myPid());
                 }
+                KioskActivity.toAndroidLog("ExitKiosk");
                 
                 callbackContext.success();
                 return true;
             } else if (KILL_APP.equals(action)) {
               android.os.Process.killProcess(android.os.Process.myPid());
+              KioskActivity.toAndroidLog("KillApp: " + android.os.Process.myPid());
 
               callbackContext.success();
               return true;
@@ -130,6 +137,7 @@ public class KioskPlugin extends CordovaPlugin {
             return false;
         } catch(Exception e) {
             System.err.println("Exception: " + e.getMessage());
+            KioskActivity.toAndroidLog("KioskPlugin Execute exception: " + e.getMessage(), 0);
             callbackContext.error(e.getMessage());
             return false;
         }

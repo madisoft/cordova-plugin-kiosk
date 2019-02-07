@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-kiosk" version="0.2">
+        id="cordova-plugin-kiosk" version="0.2.3">
 
     <name>Cordova Kiosk Mode</name>
     <author>Jan Kalina</author>
@@ -46,17 +46,23 @@
             <uses-permission android:name="android.permission.SET_PREFERRED_APPLICATIONS"/>
         </config-file>
         <config-file target="AndroidManifest.xml" parent="/manifest/application">
-                <activity
-                    android:launchMode="singleInstance" 
-                    android:name="com.t3hh4xx0r.haxlauncher.FakeHome"
-                    android:enabled="false">
-                    <intent-filter>
-                        <action android:name="android.intent.action.MAIN" />
-                        <category android:name="android.intent.category.HOME" />
-                        <category android:name="android.intent.category.DEFAULT" />
-                    </intent-filter>
-                </activity>
-            <activity android:label="Rilevatore Presenze Modalità Chiosco" android:launchMode="singleInstance" android:keepScreenOn="true" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|uiMode" android:windowSoftInputMode="adjustResize" android:name="jk.cordova.plugin.kiosk.KioskActivity" android:screenOrientation="sensorLandscape">
+             <activity
+                android:launchMode="singleInstance" 
+                android:name="jk.cordova.plugin.kiosk.FakeHome"
+                android:enabled="false">
+                <intent-filter>
+                    <action android:name="android.intent.action.MAIN" />
+                    <category android:name="android.intent.category.HOME" />
+                    <category android:name="android.intent.category.DEFAULT" />
+                </intent-filter>
+            </activity>
+            <activity android:label="Rilevatore Presenze Modalità Chiosco" 
+                      android:launchMode="singleInstance" 
+                      android:keepScreenOn="true" 
+                      android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|uiMode" 
+                      android:windowSoftInputMode="adjustResize" 
+                      android:name="jk.cordova.plugin.kiosk.KioskActivity"
+                      android:screenOrientation="sensorLandscape">
                 <intent-filter>
                     <action android:name="android.intent.action.MAIN" />
                     <category android:name="android.intent.category.DEFAULT" />

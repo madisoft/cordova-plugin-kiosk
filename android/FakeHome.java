@@ -1,4 +1,4 @@
-package com.t3hh4xx0r.haxlauncher;
+package jk.cordova.plugin.kiosk;
 
 import org.apache.cordova.*;
 import android.app.Activity;
