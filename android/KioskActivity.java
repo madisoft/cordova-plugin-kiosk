@@ -42,16 +42,14 @@ public class KioskActivity extends CordovaActivity {
     Object statusBarService;
     ActivityManager am;
 
-    protected void onStart(Integer... param) {
-        Integer force = param.length > 0 ? param[0] : 0;
-
+    protected void onStart() {
         super.onStart();
         SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
         if(Build.VERSION.SDK_INT >= 23) {
             KioskActivity.toAndroidLog("onStart # checkDrawOverlay - build version: " + Build.VERSION.SDK_INT);
 
             sp.edit().putBoolean(PREF_KIOSK_MODE, false).commit();
-            checkDrawOverlayPermission(force);
+            checkDrawOverlayPermission();
         } else {
             KioskActivity.toAndroidLog("onStart # addOverlay - build version: " + Build.VERSION.SDK_INT);
 
@@ -62,12 +60,8 @@ public class KioskActivity extends CordovaActivity {
     }
     //http://stackoverflow.com/questions/7569937/unable-to-add-window-android-view-viewrootw44da9bc0-permission-denied-for-t
     @TargetApi(Build.VERSION_CODES.M)
-    public void checkDrawOverlayPermission(Integer... param) {
-        Integer force = param.length > 0 ? param[0] : 0;
-        KioskActivity.toAndroidLog("checkDrawOverlayPermission -------> force: " + force);
-        boolean toForce = force != 0;
-
-        if (!Settings.canDrawOverlays(this.getApplicationContext()) || toForce) {
+    public void checkDrawOverlayPermission() {
+        if (!Settings.canDrawOverlays(this.getApplicationContext())) {
             KioskActivity.toAndroidLog("checkDrawOverlayPermission -> startOverlayPermission");
 
             Intent intent = new Intent(Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
@@ -182,9 +176,8 @@ public class KioskActivity extends CordovaActivity {
 
     public void onPause()
     {
-        KioskActivity.toAndroidLog("onPause -> super.onPause() and checkBoot");
+        KioskActivity.toAndroidLog("onPause -> super.onPause()");
         super.onPause();
-        this.checkBoot();
         return;
     }
     
@@ -193,25 +186,6 @@ public class KioskActivity extends CordovaActivity {
         KioskActivity.toAndroidLog("KeyDown with keycode: " + keyCode);
 
         return true;
-    }
-
-    protected void checkBoot() {
-      if(this.movedToFront) {  /* ho gia forzato l'overlay */
-          return;
-      }
-
-      long bootSince = SystemClock.elapsedRealtime();
-      long bootSinceSec = bootSince / 1000;
-
-      KioskActivity.toAndroidLog("BOOTED FROM " + bootSince + "ms, " + bootSinceSec + "s [< 120]- movedToFront: " + this.movedToFront);
-
-      if(bootSinceSec < KioskActivity.SECONDS_IN_BOOT && !this.movedToFront) {  //RANGE AGGIUSTABILE
-        KioskActivity.toAndroidLog("-------> stop & start activity with FORCE OVERLAY!");
-
-        this.onStop();
-        this.onStart(1); // force overlay app
-        this.movedToFront = true;
-      }
     }
 
     @Override

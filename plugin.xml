@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android"
-        id="cordova-plugin-kiosk" version="0.2.4">
+        id="cordova-plugin-kiosk" version="0.2.5">
 
     <name>Cordova Kiosk Mode</name>
     <author>Jan Kalina</author>
@@ -69,11 +69,22 @@
                     <category android:name="android.intent.category.HOME" />
                 </intent-filter>
             </activity>
+            <receiver android:name="jk.cordova.plugin.kiosk.BootCompletedReceiver">
+                <intent-filter android:priority="999">
+                    <action android:name="android.intent.action.BOOT_COMPLETED" />
+                    <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                </intent-filter>
+            </receiver>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
         </config-file>
 
         <source-file src="android/KioskActivity.java" target-dir="src/jk/cordova/plugin/kiosk" />
         <source-file src="android/KioskPlugin.java" target-dir="src/jk/cordova/plugin/kiosk" />
         <source-file src="android/FakeHome.java" target-dir="src/jk/cordova/plugin/kiosk" />
+        <source-file src="android/BootCompletedReceiver.java" target-dir="src/jk/cordova/plugin/kiosk" />
 
     </platform>
 
